@@ -31,6 +31,6 @@ export const Router = (app) => {
 
   // Server start
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}/`)
+    console.log(`Server running on port ${PORT}`)
   })
 }

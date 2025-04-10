@@ -1,7 +1,7 @@
 import 'dotenv/config'
 
 // APP DATA
-const URL_FRONT = process.env.URL_FRONT || 'http://localhost:3000/'
+const URL_FRONT = process.env.URL_FRONT || 'http://localhost:5173/'
 const PORT = process.env.PORT || 8080
 
 // FIREBASE DATA
