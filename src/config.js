@@ -2,7 +2,7 @@ import 'dotenv/config'
 
 // APP DATA
 const isDev = process.env.NODE_ENV !== 'production'
-const allowedOrigins = process.env.CORS_ORIGINS?.split(',') || []
+const allowedOrigins = (process.env.CORS_ORIGINS || '').split(',')
 if (isDev) allowedOrigins.push('http://localhost:5173')
 
 const PORT = process.env.PORT || 8080
@@ -16,6 +16,9 @@ const firebaseData = {
   messagingSenderId: process.env.messagingSenderId,
   appId: process.env.appId
 }
+
+console.log(isDev)
+console.log('Allowed Origins:', allowedOrigins)
 
 const corsOptions = {
   origin: (origin, callback) => {
