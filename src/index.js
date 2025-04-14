@@ -15,7 +15,8 @@ app.use(cookieParser())
 app.use(compression())
 app.use(helmet())
 
-// Cors
+// Cors & preflight options
 app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 
 Router(app)
