@@ -1,7 +1,10 @@
 import 'dotenv/config'
 
 // APP DATA
-const URL_FRONT = process.env.URL_FRONT || 'http://localhost:5173/'
+const isDev = process.env.NODE_ENV !== 'production'
+const allowedOrigins = process.env.CORS_ORIGINS?.split(',') || []
+if (isDev) allowedOrigins.push('http://localhost:5173')
+
 const PORT = process.env.PORT || 8080
 
 // FIREBASE DATA
@@ -14,10 +17,9 @@ const firebaseData = {
   appId: process.env.appId
 }
 
-const whiteList = [URL_FRONT]
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || whiteList.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS'))
