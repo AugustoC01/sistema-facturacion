@@ -1,6 +1,6 @@
 // firebase functions
 import { getItemsByField } from '../service/db.js'
-import { addEmployee } from './employeeController.js'
+import { addEmployee, updateEmployee } from './employeeController.js'
 // password functions
 import { comparePassword } from '../utils/bcrypt.js'
 // cookie session functions
@@ -63,5 +63,22 @@ export const logout = async (req, res) => {
     return res.status(200).json({ msg: 'Cierre de sesion exitoso' })
   } catch (e) {
     return res.status(500).json({ msg: 'Error al cerrar sesion' })
+  }
+}
+
+export const recoverPassword = async (req, res) => {
+  try {
+    const { email } = req.body
+    const data = await getItemsByField(collectionName, 'email', email)
+    const employee = data[0]
+
+    if (employee) {
+      const newPassword = await createId(8)
+      req.body.password = newPassword
+      updateEmployee(req, res)
+    }
+    return res.status(200).json({ msg: 'Si el correo existe, se le enviara un correo con la nueva contraseña' })
+  } catch (error) {
+
   }
 }

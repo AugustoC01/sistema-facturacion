@@ -7,6 +7,13 @@ if (isDev) allowedOrigins.push('http://localhost:5173')
 
 const PORT = process.env.PORT || 8080
 
+// NODEMAILER DATA
+const mailer = {
+  DESTINY: process.env.DESTINY,
+  PASS: process.env.PASS,
+  SENDER: process.env.SENDER
+}
+
 // FIREBASE DATA
 const firebaseData = {
   apiKey: process.env.apiKey,
@@ -36,4 +43,4 @@ const corsOptions = {
   optionsSuccessStatus: 204
 }
 
-export { PORT, firebaseData, corsOptions }
+export { PORT, firebaseData, corsOptions, mailer }

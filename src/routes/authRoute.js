@@ -3,7 +3,8 @@ import { Router } from 'express'
 import {
   signUp,
   login,
-  logout
+  logout,
+  recoverPassword
 } from '../controllers/authController.js'
 
 const router = Router()
@@ -12,5 +13,6 @@ const router = Router()
 router.post('/login', login)
 router.post('/logout', logout)
 router.post('/signup', signUp)
+router.post('/forgotPassword', recoverPassword)
 
 export default router
