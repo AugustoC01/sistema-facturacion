@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
-import mailer from '../config.js'
+import { mailer } from '../config.js'
 
-const { DESTINY, PASS, SENDER } = mailer
+const { SENDER, PASS } = mailer
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -11,10 +11,10 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-export const sendEmail = async (msg) => {
+export const sendEmail = async (msg, receiver = null) => {
   const mailOptons = {
     from: SENDER,
-    to: DESTINY,
+    to: receiver || SENDER,
     subject: msg.subject,
     text: msg.text
   }

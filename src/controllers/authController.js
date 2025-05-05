@@ -1,13 +1,11 @@
-// firebase functions
-import { getItemsByField } from '../service/db.js'
-import { addEmployee, updateEmployee } from './employeeController.js'
+// service functions
+import { getEmployeeByEmail, createEmployee, updateEmployeePassword } from '../service/employeeService.js'
 // password functions
 import { comparePassword } from '../utils/bcrypt.js'
 // cookie session functions
 import { createSession, destroySession } from '../middleware/userAuth.js'
 import { createId } from '../utils/idGenerator.js'
-
-const collectionName = 'employees'
+import { sendEmail } from '../utils/nodemailer.js'
 
 const validEmail = (email) => {
   const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/
@@ -18,14 +16,19 @@ export const signUp = async (req, res) => {
   try {
     const { name, email, password } = req.body
     const employee = { name, email, password }
-    console.log(employee)
     employee.code = await createId(3)
+    console.log(employee)
     if (!validEmail(employee.email)) {
       return res.status(400).json({ msg: 'Correo invalido' })
     }
-    addEmployee(employee)
-    res.status(200).json({ msg: 'Empleado registrado correctamente' })
+    const existentEmployee = await getEmployeeByEmail(email)
+    if (existentEmployee) {
+      return res.status(400).json({ msg: 'Ese correo no se encuentra disponible' })
+    }
+    await createEmployee(employee)
+    return res.status(200).json({ msg: 'Empleado registrado correctamente' })
   } catch (e) {
+    console.log(e)
     return res.status(500).json({ msg: 'Error al registrarse' })
   }
 }
@@ -37,8 +40,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ msg: 'Correo invalido' })
     }
 
-    const data = await getItemsByField(collectionName, 'email', email)
-    const employee = data[0]
+    const employee = await getEmployeeByEmail(email)
 
     if (!employee) {
       return res.status(401).json({ msg: 'Cuenta no encontrada' })
@@ -69,16 +71,17 @@ export const logout = async (req, res) => {
 export const recoverPassword = async (req, res) => {
   try {
     const { email } = req.body
-    const data = await getItemsByField(collectionName, 'email', email)
-    const employee = data[0]
+    const employee = await getEmployeeByEmail(email)
 
     if (employee) {
       const newPassword = await createId(8)
-      req.body.password = newPassword
-      updateEmployee(req, res)
+      console.log(newPassword)
+      await updateEmployeePassword(email, newPassword)
+      await sendEmail({ subject: 'Recuperacion de contraseña', text: `Su nueva contraseña es: ${newPassword}` }, email)
+      return res.status(200).json({ msg: 'Se ha enviado un correo con la nueva contraseña' })
     }
-    return res.status(200).json({ msg: 'Si el correo existe, se le enviara un correo con la nueva contraseña' })
+    return res.status(200).json({ msg: 'No existe una cuenta asociada a ese correo' })
   } catch (error) {
-
+    console.log(error)
   }
 }

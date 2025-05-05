@@ -9,9 +9,8 @@ const PORT = process.env.PORT || 8080
 
 // NODEMAILER DATA
 const mailer = {
-  DESTINY: process.env.DESTINY,
-  PASS: process.env.PASS,
-  SENDER: process.env.SENDER
+  SENDER: process.env.SENDER,
+  PASS: process.env.PASS
 }
 
 // FIREBASE DATA
