@@ -173,8 +173,8 @@ export const updateStock = async (productId, quantity) => {
       throw new Error(`Stock insuficiente para el producto ${product.name}`)
     }
     const remaining = product.stock - quantity
-    console.log('stock: ', product.stock, 'quantity: ', quantity)
-    console.log('remaining: ', remaining)
+    // console.log('stock: ', product.stock, 'quantity: ', quantity)
+    // console.log('remaining: ', remaining)
     const updatedProduct = { ...product, stock: remaining, status: remaining !== 0 }
     await updateItem(collectionName, productId, updatedProduct)
   } catch (e) {

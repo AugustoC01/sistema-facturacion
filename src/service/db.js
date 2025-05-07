@@ -25,7 +25,7 @@ export const createItem = async (collectionName, item) => {
     const docRef = doc(collectionRef, item.id)
     await setDoc(docRef, item)
     // console.log('Item creado con éxito!')
-    console.log({ id: docRef.id, ...item })
+    // console.log({ id: docRef.id, ...item })
   } catch (error) {
     console.error('Error al crear el item:', error)
   }
@@ -87,11 +87,10 @@ export const getItemById = async (collectionName, id) => {
     const itemDoc = await getDoc(docRef)
     if (itemDoc.exists()) {
       const item = { id: itemDoc.id, ...itemDoc.data() }
-      console.log('Item:', item)
+      // console.log('Item:', item)
       return item
-    } else {
-      console.log('Item no encontrado.')
     }
+    return null
   } catch (error) {
     console.error('Error al leer el item:', error)
   }
@@ -116,10 +115,8 @@ export const getItemsBelowField = async (collectionName, fieldName, fieldValue) 
     const collectionRef = collection(db, collectionName)
     const q = query(collectionRef, where(fieldName, '<=', fieldValue))
     const itemList = await getDocs(q)
-
     const items = docsToArray(itemList.docs)
-
-    console.log(`Items filtrados por ${fieldName}: ${fieldValue}`, items)
+    // console.log(`Items filtrados por ${fieldName}: ${fieldValue}`, items)
     return items
   } catch (error) {
     console.error('Error al leer los items:', error)
@@ -132,10 +129,8 @@ export const getItemsAboveField = async (collectionName, fieldName, fieldValue) 
     const collectionRef = collection(db, collectionName)
     const q = query(collectionRef, where(fieldName, '>=', fieldValue))
     const itemList = await getDocs(q)
-
     const items = docsToArray(itemList.docs)
-
-    console.log(`Items filtrados por ${fieldName}: ${fieldValue}`, items)
+    // console.log(`Items filtrados por ${fieldName}: ${fieldValue}`, items)
     return items
   } catch (error) {
     console.error('Error al leer los items:', error)
@@ -148,10 +143,8 @@ export const getItemsBetweenField = async (collectionName, fieldName, minValue, 
     const collectionRef = collection(db, collectionName)
     const q = query(collectionRef, where(fieldName, '>=', minValue), where(fieldName, '<=', maxValue))
     const itemList = await getDocs(q)
-
     const items = docsToArray(itemList.docs)
-
-    console.log(`Items filtrados por ${fieldName}: [${minValue},${maxValue}]`, items)
+    // console.log(`Items filtrados por ${fieldName}: [${minValue},${maxValue}]`, items)
     return items
   } catch (error) {
     console.error('Error al leer los items:', error)

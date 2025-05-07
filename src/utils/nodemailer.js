@@ -21,8 +21,9 @@ export const sendEmail = async (msg, receiver = null) => {
 
   try {
     await transporter.sendMail(mailOptons)
-    console.log(`Correo enviado por ${msg.subject}`)
-  } catch (error) {
-    console.log(`Error al enviar el correo: ${error}`)
+    // console.log(`Correo enviado por ${msg.subject}`)
+  } catch (e) {
+    // console.log(`Error al enviar el correo: ${error}`)
+    console.log(e)
   }
 }

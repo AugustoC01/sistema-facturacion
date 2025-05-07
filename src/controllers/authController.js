@@ -17,7 +17,7 @@ export const signUp = async (req, res) => {
     const { name, email, password } = req.body
     const employee = { name, email, password }
     employee.code = await createId(3)
-    console.log(employee)
+    // console.log(employee)
     if (!validEmail(employee.email)) {
       return res.status(400).json({ msg: 'Correo invalido' })
     }
@@ -75,7 +75,7 @@ export const recoverPassword = async (req, res) => {
 
     if (employee) {
       const newPassword = await createId(8)
-      console.log(newPassword)
+      // console.log(newPassword)
       await updateEmployeePassword(email, newPassword)
       await sendEmail({ subject: 'Recuperacion de contraseña', text: `Su nueva contraseña es: ${newPassword}` }, email)
       return res.status(200).json({ msg: 'Se ha enviado un correo con la nueva contraseña' })
