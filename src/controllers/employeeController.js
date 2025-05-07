@@ -1,28 +1,13 @@
 // firebase functions
-import { createItem, updateItem, deleteItem, getItems, getItemById, getItemsByField } from '../service/db.js'
+import { getAllEmployees, getEmployeeDataById, removeEmployee } from '../service/employeeService.js'
 // password functions
-import { hashPassword } from '../utils/bcrypt.js'
 
 const collectionName = 'employees'
 
-// Add employee
-export const addEmployee = async (newEmployee) => {
-  const existentEmployee = await getItemsByField(collectionName, 'email', newEmployee.email)
-  if (existentEmployee.length !== 0) {
-    throw new Error('Ese correo ya esta registrado')
-  }
-  const hashedPassword = await hashPassword(newEmployee.password)
-  newEmployee.password = hashedPassword
-  await createItem(collectionName, newEmployee)
-}
-
 // get all employees
-export const getEmployees = async (req, res) => {
+export const getEmployees = async (_req, res) => {
   try {
-    const employees = await getItems(collectionName)
-    for (const employee of employees) {
-      delete employee.password
-    }
+    const employees = await getAllEmployees()
     return res.status(200).json(employees)
   } catch (e) {
     return res.status(500).json({ msg: 'Error al obtener empleados' })
@@ -33,8 +18,8 @@ export const getEmployees = async (req, res) => {
 export const getEmployeeById = async (req, res) => {
   try {
     const { id } = req.params
-    const employee = await getItemById(collectionName, id)
-    delete employee.password
+    const employee = await getEmployeeDataById(id)
+    if (!employee) return res.status(404).json({ msg: 'Empleado no encontrado' })
     return res.status(200).json(employee)
   } catch (e) {
     return res.status(500).json({ msg: 'Error al obtener empleados' })
@@ -45,17 +30,12 @@ export const getEmployeeById = async (req, res) => {
 export const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params
-    const { password } = req.body
-    const updatedEmployee = { password }
+    const { data } = req.body
 
-    if (updatedEmployee.password) {
-      updatedEmployee.password = await hashPassword(updatedEmployee.password)
-    }
-
-    await updateItem(collectionName, id, updatedEmployee)
+    await updateEmployee(id, data)
     return res.status(200).json({ msg: 'Empleado actualizado correctamente!' })
   } catch (e) {
-    return res.status(500).json({ msg: 'Error al obtener el empleado' })
+    return res.status(500).json({ msg: 'Error al actualizar el empleado' })
   }
 }
 
@@ -63,7 +43,9 @@ export const updateEmployee = async (req, res) => {
 export const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params
-    await deleteItem(collectionName, id)
+    const deleted = await removeEmployee(collectionName, id)
+    if (!deleted) return res.status(404).json({ msg: 'Empleado no encontrado' })
+    return res.status(200).json({ msg: 'Empleado actualizado correctamente!' })
   } catch (e) {
     return res.status(500).json({ msg: 'Error al eliminar el empleado' })
   }

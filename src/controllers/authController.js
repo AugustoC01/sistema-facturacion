@@ -1,5 +1,5 @@
 // service functions
-import { getEmployeeByEmail, createEmployee, updateEmployeePassword } from '../service/employeeService.js'
+import { getEmployeeByEmail, addEmployee, updateEmployeePassword } from '../service/employeeService.js'
 // password functions
 import { comparePassword } from '../utils/bcrypt.js'
 // cookie session functions
@@ -25,7 +25,7 @@ export const signUp = async (req, res) => {
     if (existentEmployee) {
       return res.status(400).json({ msg: 'Ese correo no se encuentra disponible' })
     }
-    await createEmployee(employee)
+    await addEmployee(employee)
     return res.status(200).json({ msg: 'Empleado registrado correctamente' })
   } catch (e) {
     console.log(e)
@@ -80,8 +80,9 @@ export const recoverPassword = async (req, res) => {
       await sendEmail({ subject: 'Recuperacion de contraseña', text: `Su nueva contraseña es: ${newPassword}` }, email)
       return res.status(200).json({ msg: 'Se ha enviado un correo con la nueva contraseña' })
     }
-    return res.status(200).json({ msg: 'No existe una cuenta asociada a ese correo' })
+    return res.status(404).json({ msg: 'No existe una cuenta asociada a ese correo' })
   } catch (error) {
     console.log(error)
+    return res.status(500).json({ msg: 'Error al recuperar contraseña' })
   }
 }

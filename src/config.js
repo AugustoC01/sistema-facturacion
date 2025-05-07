@@ -23,7 +23,6 @@ const firebaseData = {
   appId: process.env.appId
 }
 
-console.log(isDev)
 console.log('Allowed Origins:', allowedOrigins)
 
 const corsOptions = {
