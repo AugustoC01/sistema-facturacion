@@ -3,7 +3,7 @@ import { createItem, updateItem, deleteItem, getItems, getItemById } from '../se
 // Product stock functions
 import { updateStock, restoreStock } from './productController.js'
 // Income Reports functions
-import { increaseDailyReport, decreaseDailyReport, getIncomeByDateRange, getDailyReports } from './reportsController.js'
+import { increaseDailyReport, decreaseDailyReport } from './reportsController.js'
 // Collection name
 const collectionName = 'sales'
 
@@ -39,6 +39,7 @@ export const addSale = async (req, res) => {
       const today = new Date().toLocaleDateString('en-GB')
       sale.date = today
     }
+    console.log(sale)
     await createItem(collectionName, sale)
     await updateStockForSale(sale) // updates stock for sold products
     await increaseDailyReport(sale) // updates daily income report
@@ -79,28 +80,6 @@ export const deleteSale = async (req, res) => {
     return res.status(200).json({ msg: 'Factura eliminada correctamente' })
   } catch (e) {
     const error = new Error('Error, no se encontró la venta')
-    return res.status(404).json({ msg: error.message })
-  }
-}
-
-export const getAllReports = async (req, res) => {
-  try {
-    const reports = await getDailyReports()
-    return res.status(200).json(reports)
-  } catch (e) {
-    const error = new Error('Error, no se encontraron las ventas')
-    return res.status(404).json({ msg: error.message })
-  }
-}
-
-// gets a revenue report for a time range
-export const getIncomeReport = async (req, res) => {
-  try {
-    const { start, end } = req.params
-    const salesIncome = await getIncomeByDateRange(start, end)
-    return res.status(200).json(salesIncome)
-  } catch (e) {
-    const error = new Error('Error, no se encontraron las ventas')
     return res.status(404).json({ msg: error.message })
   }
 }

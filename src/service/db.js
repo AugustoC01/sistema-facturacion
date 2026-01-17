@@ -1,152 +1,145 @@
-import { db, collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, FieldValue, query, where } from './firebase.js'
+import { db } from './firebase.js'
+import { FieldValue } from 'firebase-admin/firestore'
 import { createId } from '../utils/idGenerator.js'
 
-// Gets a reference to a specified collection
-const getCollectionRef = (collectionName) => collection(db, collectionName)
+// Gets
 
-const docsToArray = (itemList) => {
-  if (itemList.length !== 0) {
-    const items = itemList.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }))
-    return items
+// Helper to transform the snapshot into an array
+const docsToArray = (snapshot) => {
+  if (snapshot.empty) {
+    return []
   }
-  return []
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }))
 }
 
-// Creates a new item in the specified collection
+// Create item
 export const createItem = async (collectionName, item) => {
   try {
-    const collectionRef = getCollectionRef(collectionName)
     if (!item.id) {
       item.id = await createId()
     }
-    const docRef = doc(collectionRef, item.id)
-    await setDoc(docRef, item)
-    // console.log('Item creado con éxito!')
-    // console.log({ id: docRef.id, ...item })
+    await db.collection(collectionName).doc(item.id).set(item)
+    return item
   } catch (error) {
-    console.error('Error al crear el item:', error)
+    console.error('Unable to create: ', error)
+    throw error
   }
 }
 
-// Updates an existing item by its ID in the specified collection
+// Udate item
 export const updateItem = async (collectionName, id, item) => {
   try {
-    // const collectionRef = getCollectionRef(collectionName)
-    const docRef = doc(db, collectionName, id)
-    await updateDoc(docRef, item)
-    // console.log('Item actualizado con éxito!')
+    await db.collection(collectionName).doc(id).update(item)
   } catch (error) {
-    console.error('Error al actualizar el item:', error)
+    console.error('Unable to update: ', error)
+    throw error
   }
 }
 
-// Deletes an item by its ID in the specified collection
+// Delete Item
 export const deleteItem = async (collectionName, id) => {
   try {
-    const docRef = doc(db, collectionName, id)
-    await deleteDoc(docRef)
-    // console.log('Item eliminado con éxito!')
+    await db.collection(collectionName).doc(id).delete()
   } catch (error) {
-    console.error('Error al eliminar el item:', error)
+    console.error('Unable to delete: ', error)
+    throw error
   }
 }
 
-// Deletes a specific field in an item by its ID in the specified collection
+// Delete Specific Field
 export const deleteItemField = async (collectionName, id, fieldName) => {
   try {
-    const docRef = doc(db, collectionName, id)
-    await updateDoc(docRef, {
+    await db.collection(collectionName).doc(id).update({
       [fieldName]: FieldValue.delete()
     })
-    // console.log('Campo actualizado con éxito!')
   } catch (error) {
-    console.error('Error al eliminar el item:', error)
+    console.error('Unable to delete the field: ', error)
+    throw error
   }
 }
 
-// Fetches all items from the specified collection
+// Get all items
 export const getItems = async (collectionName) => {
   try {
-    const collectionRef = getCollectionRef(collectionName)
-    const itemList = await getDocs(collectionRef)
-    const items = docsToArray(itemList.docs)
-    // console.log('Items:', items)
-    return items
+    const snapshot = await db.collection(collectionName).get()
+    return docsToArray(snapshot)
   } catch (error) {
-    console.error('Error al leer los items:', error)
+    console.error('Unable to get items: ', error)
+    throw error
   }
 }
 
-// Fetches a single item by its ID from the specified collection
+// Get Item by ID
 export const getItemById = async (collectionName, id) => {
   try {
-    const docRef = doc(db, collectionName, id)
-    const itemDoc = await getDoc(docRef)
-    if (itemDoc.exists()) {
-      const item = { id: itemDoc.id, ...itemDoc.data() }
-      // console.log('Item:', item)
-      return item
+    const docSnap = await db.collection(collectionName).doc(id).get()
+
+    if (docSnap.exists) {
+      return { id: docSnap.id, ...docSnap.data() }
     }
     return null
   } catch (error) {
-    console.error('Error al leer el item:', error)
+    console.error('Unable to get the item: ', error)
+    throw error
   }
 }
 
-// Query functions
-// Fetches all the items that match with the query
+// Query: Get Items By Field (Equal)
 export const getItemsByField = async (collectionName, fieldName, fieldValue) => {
   try {
-    const collectionRef = collection(db, collectionName)
-    const q = query(collectionRef, where(fieldName, '==', fieldValue))
-    const itemList = await getDocs(q)
-    const items = docsToArray(itemList.docs)
-    return items
+    const snapshot = await db.collection(collectionName)
+      .where(fieldName, '==', fieldValue)
+      .get()
+
+    return docsToArray(snapshot)
   } catch (error) {
-    console.error('Error al leer los items:', error)
+    console.error('Unable to get items by field: ', error)
+    throw error
   }
 }
 
+// Query: Get Items Below Field (<=)
 export const getItemsBelowField = async (collectionName, fieldName, fieldValue) => {
   try {
-    const collectionRef = collection(db, collectionName)
-    const q = query(collectionRef, where(fieldName, '<=', fieldValue))
-    const itemList = await getDocs(q)
-    const items = docsToArray(itemList.docs)
-    // console.log(`Items filtrados por ${fieldName}: ${fieldValue}`, items)
-    return items
+    const snapshot = await db.collection(collectionName)
+      .where(fieldName, '<=', fieldValue)
+      .get()
+
+    return docsToArray(snapshot)
   } catch (error) {
-    console.error('Error al leer los items:', error)
+    console.error('Unable to get filtered items: ', error)
+    throw error
   }
 }
 
-// Fetches all the items that match with the query
+// Query: Get Items Above Field (>=)
 export const getItemsAboveField = async (collectionName, fieldName, fieldValue) => {
   try {
-    const collectionRef = collection(db, collectionName)
-    const q = query(collectionRef, where(fieldName, '>=', fieldValue))
-    const itemList = await getDocs(q)
-    const items = docsToArray(itemList.docs)
-    // console.log(`Items filtrados por ${fieldName}: ${fieldValue}`, items)
-    return items
+    const snapshot = await db.collection(collectionName)
+      .where(fieldName, '>=', fieldValue)
+      .get()
+
+    return docsToArray(snapshot)
   } catch (error) {
-    console.error('Error al leer los items:', error)
+    console.error('Unable to get filtered items: ', error)
+    throw error
   }
 }
 
-// Fetches all the items that match with the query
+// Query: Get Items Between Fields
 export const getItemsBetweenField = async (collectionName, fieldName, minValue, maxValue) => {
   try {
-    const collectionRef = collection(db, collectionName)
-    const q = query(collectionRef, where(fieldName, '>=', minValue), where(fieldName, '<=', maxValue))
-    const itemList = await getDocs(q)
-    const items = docsToArray(itemList.docs)
-    // console.log(`Items filtrados por ${fieldName}: [${minValue},${maxValue}]`, items)
-    return items
+    const snapshot = await db.collection(collectionName)
+      .where(fieldName, '>=', minValue)
+      .where(fieldName, '<=', maxValue)
+      .get()
+
+    return docsToArray(snapshot)
   } catch (error) {
-    console.error('Error al leer los items:', error)
+    console.error('Unable to get filtered items: ', error)
+    throw error
   }
 }

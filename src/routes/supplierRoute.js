@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { userAuth } from '../middleware/userAuth.js'
 
 import {
   getSuppliers,
@@ -10,7 +9,6 @@ import {
 } from '../controllers/supplierController.js'
 
 const router = Router()
-router.use(userAuth)
 
 router.get('/', getSuppliers)
 router.get('/:id', getSupplierById)

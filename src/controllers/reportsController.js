@@ -14,7 +14,8 @@ export const increaseDailyReport = async (sale) => {
       date,
       incomeByPaymentMethod: {},
       totalIncome: 0,
-      salesCount: 0
+      salesCount: {},
+      totalSales: 0
     }
     await createItem(collectionName, { id, ...dailyReport })
   }
@@ -22,11 +23,18 @@ export const increaseDailyReport = async (sale) => {
   const paymentMethod = sale.paymentMethod
   const total = sale.total
 
-  dailyReport.incomeByPaymentMethod[paymentMethod] =
-    (dailyReport.incomeByPaymentMethod[paymentMethod] || 0) + total
+  if (!dailyReport.salesCount[paymentMethod]) {
+    dailyReport.salesCount[paymentMethod] = 0
+  }
 
+  if (!dailyReport.incomeByPaymentMethod[paymentMethod]) {
+    dailyReport.incomeByPaymentMethod[paymentMethod] = 0
+  }
+
+  dailyReport.incomeByPaymentMethod[paymentMethod] += total
+  dailyReport.salesCount[paymentMethod] += 1
   dailyReport.totalIncome += total
-  dailyReport.salesCount += 1
+  dailyReport.totalSales += 1
 
   await updateItem(collectionName, id, dailyReport)
 }
@@ -41,10 +49,11 @@ export const decreaseDailyReport = async (sale) => {
   const paymentMethod = sale.paymentMethod
   const total = sale.total
 
-  if (dailyReport.incomeByPaymentMethod[paymentMethod] > 0 && dailyReport.salesCount > 0) {
+  if (dailyReport.incomeByPaymentMethod[paymentMethod] > 0) {
     dailyReport.incomeByPaymentMethod[paymentMethod] += -total
+    dailyReport.salesCount[paymentMethod] += -1
     dailyReport.totalIncome += -total
-    dailyReport.salesCount += -1
+    dailyReport.totalSales += -1
   }
   await updateItem(collectionName, id, dailyReport)
 }
@@ -58,7 +67,24 @@ export const getIncomeByDateRange = async (start, end) => {
   return totalIncome
 }
 
-export const getDailyReports = async () => {
-  const reports = await getItems(collectionName)
-  return reports
+// gets a revenue report for a time range
+export const getDaysReport = async (req, res) => {
+  try {
+    const { begin, end } = req.params
+    const salesIncome = await getIncomeByDateRange(begin, end)
+    return res.status(200).json(salesIncome)
+  } catch (e) {
+    const error = new Error('Error, no se encontraron las ventas')
+    return res.status(404).json({ msg: error.message })
+  }
+}
+
+export const getReports = async (req, res) => {
+  try {
+    const reports = await getItems(collectionName)
+    return res.status(200).json(reports)
+  } catch (error) {
+    console.log(error)
+    return res.status(404).json({ msg: error.message })
+  }
 }
