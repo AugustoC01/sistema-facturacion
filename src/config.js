@@ -2,9 +2,14 @@ import 'dotenv/config'
 
 // APP DATA
 const isDev = process.env.NODE_ENV !== 'production'
+
+// Demo config
+const isDemo = process.env.APP_MODE === 'demo'
+const maxLimit = process.env.MAX_LIMIT || 30
+
+// Cors config
 const allowedOrigins = (process.env.CORS_ORIGINS || '').split(',')
 if (isDev) allowedOrigins.push('http://localhost:5173')
-
 const PORT = process.env.PORT || 8080
 
 // NODEMAILER DATA
@@ -14,20 +19,13 @@ const mailer = {
 }
 
 // FIREBASE DATA
-const firebaseData = {
-  apiKey: process.env.apiKey,
-  authDomain: process.env.authDomain,
-  projectId: process.env.projectId,
-  storageBucket: process.env.storageBucket,
-  messagingSenderId: process.env.messagingSenderId,
-  appId: process.env.appId
-}
+const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
 
-console.log('Allowed Origins:', allowedOrigins)
+// console.log('Allowed Origins:', allowedOrigins)
 
 const corsOptions = {
   origin: (origin, callback) => {
-    console.log(origin)
+    // console.log(origin)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true)
     } else {
@@ -41,4 +39,4 @@ const corsOptions = {
   optionsSuccessStatus: 204
 }
 
-export { PORT, firebaseData, corsOptions, mailer }
+export { PORT, corsOptions, mailer, isDemo, maxLimit, serviceAccountPath }

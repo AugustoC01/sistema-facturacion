@@ -39,7 +39,6 @@ export const addSale = async (req, res) => {
       const today = new Date().toLocaleDateString('en-GB')
       sale.date = today
     }
-    console.log(sale)
     await createItem(collectionName, sale)
     await updateStockForSale(sale) // updates stock for sold products
     await increaseDailyReport(sale) // updates daily income report
