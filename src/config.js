@@ -5,10 +5,12 @@ const isDev = process.env.NODE_ENV !== 'production'
 
 // Demo config
 const isDemo = process.env.APP_MODE === 'demo'
-const maxLimit = process.env.MAX_LIMIT || 30
+const maxLimit = Number(process.env.MAX_LIMIT) || 3
 
 // Cors config
-const allowedOrigins = (process.env.CORS_ORIGINS || '').split(',')
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(',')
+  : []
 if (isDev) allowedOrigins.push('http://localhost:5173')
 const PORT = process.env.PORT || 8080
 
@@ -34,8 +36,8 @@ const corsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-type', 'Authorization'],
-  preflightContine: false,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
   optionsSuccessStatus: 204
 }
 
