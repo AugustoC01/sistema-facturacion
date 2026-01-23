@@ -32,4 +32,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:demo
+          tags: ghcr.io/augustoc01/sistema-facturacion:demo
