@@ -18,8 +18,8 @@ RUN mkdir -p /app/secrets \
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-USER app
-
 EXPOSE 8080
 ENTRYPOINT ["/entrypoint.sh"]
+
+USER app
 CMD ["node", "src/index.js"]
