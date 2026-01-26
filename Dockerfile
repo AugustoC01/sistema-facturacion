@@ -10,16 +10,14 @@ RUN npm ci --omit=dev
 
 COPY . .
 
-# Directorio donde se copiará el secret
 RUN mkdir -p /app/secrets \
     && chown -R app:app /app
 
-# Entrypoint
+# Instalar su-exec (para bajar privilegios)
+RUN apk add --no-cache su-exec
+
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 8080
 ENTRYPOINT ["/entrypoint.sh"]
-
-USER app
-CMD ["node", "src/index.js"]
