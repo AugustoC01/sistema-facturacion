@@ -13,11 +13,13 @@ COPY . .
 RUN mkdir -p /app/secrets \
     && chown -R app:app /app
 
-# Instalar su-exec (para bajar privilegios)
+# Para bajar privilegios
 RUN apk add --no-cache su-exec
 
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 8080
+
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["node", "src/index.js"]
