@@ -11,12 +11,6 @@ import { Router } from './routes/router.js'
 
 const app = express()
 
-// DEMO MODE
-app.set('trust proxy', 1)
-if (isDemo) {
-  applyDemoLimiter(app)
-}
-
 app.use(express.json())
 app.use(cookieParser())
 app.use(compression())
@@ -25,5 +19,11 @@ app.use(helmet())
 // Cors & preflight options
 app.use(cors(corsOptions))
 app.options('*', cors(corsOptions))
+
+// DEMO MODE
+app.set('trust proxy', 1)
+if (isDemo) {
+  applyDemoLimiter(app)
+}
 
 Router(app)

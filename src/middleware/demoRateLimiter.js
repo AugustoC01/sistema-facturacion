@@ -6,8 +6,11 @@ const demoWriteLimiter = rateLimit({
   max: maxLimit, // operaciones por IP
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    message: 'Modo demo: límite diario de operaciones alcanzado'
+  handler: (req, res) => {
+    res.status(403).json({
+      code: 'DEMO_LIMIT_REACHED',
+      message: 'Modo demo: límite diario de operaciones alcanzado'
+    })
   }
 })
 
