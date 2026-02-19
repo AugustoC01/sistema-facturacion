@@ -11,7 +11,10 @@ const maxLimit = Number(process.env.MAX_LIMIT) || 3
 const allowedOrigins = process.env.CORS_ORIGINS
   ? process.env.CORS_ORIGINS.split(',')
   : []
-if (isDev) allowedOrigins.push('http://localhost:5173')
+if (isDev) {
+  allowedOrigins.push('http://localhost:5173')
+  console.log('Allowed Origins:', allowedOrigins)
+}
 const PORT = process.env.PORT || 8080
 
 // NODEMAILER DATA
@@ -23,11 +26,9 @@ const mailer = {
 // FIREBASE DATA
 const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
 
-// console.log('Allowed Origins:', allowedOrigins)
-
 const corsOptions = {
   origin: (origin, callback) => {
-    // console.log(origin)
+    if (isDev) console.log(origin)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true)
     } else {
