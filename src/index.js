@@ -3,8 +3,10 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import compression from 'compression'
 import helmet from 'helmet'
-import { corsOptions, isDemo } from './config.js'
+import pinoHttp from 'pino-http'
+import { corsOptions, isDemo, isDev } from './config.js'
 import { applyDemoLimiter } from './middleware/demoRateLimiter.js'
+import logger from './utils/logger.js'
 
 // Router import
 import { Router } from './routes/router.js'
@@ -15,6 +17,9 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(compression())
 app.use(helmet())
+
+// Request logger (dev only)
+if (isDev) app.use(pinoHttp({ logger }))
 
 // Cors & preflight options
 app.use(cors(corsOptions))

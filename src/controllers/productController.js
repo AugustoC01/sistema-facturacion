@@ -1,5 +1,7 @@
 // Firestore methods
 import { createItem, updateItem, deleteItem, deleteItemField, getItems, getItemById, getItemsByField, getItemsAboveField, getItemsBelowField } from '../service/db.js'
+import logger from '../utils/logger.js'
+
 // Collection name
 const collectionName = 'products'
 
@@ -9,9 +11,9 @@ const collectionName = 'products'
 export const getProducts = async (req, res) => {
   try {
     const products = await getItems(collectionName)
-    // console.log(products)
     return res.status(200).json(products)
   } catch (e) {
+    logger.error(e, 'Error fetching products')
     const error = new Error('Error, no se encontraron los productos')
     return res.status(404).json({ msg: error.message })
   }
@@ -24,6 +26,7 @@ export const getProductsByCategory = async (req, res) => {
     const products = await getItemsByField(collectionName, 'category', categoryId)
     return res.json(products)
   } catch (e) {
+    logger.error(e, 'Error fetching products by category')
     const error = new Error('Error, no se encontraron los productos')
     return res.status(404).json({ msg: error.message })
   }
@@ -35,6 +38,7 @@ export const getProductsBySupplier = async (req, res) => {
     const products = await getItemsByField(collectionName, 'supplier', supplierId)
     return res.json(products)
   } catch (e) {
+    logger.error(e, 'Error fetching products by supplier')
     const error = new Error('Error, no se encontraron los productos')
     return res.status(404).json({ msg: error.message })
   }
@@ -46,17 +50,19 @@ export const getEnabledProducts = async (req, res) => {
     const products = getItemsByField(collectionName, 'status', true)
     return res.status(200).json(products)
   } catch (e) {
+    logger.error(e, 'Error fetching enabled products')
     const error = new Error('Error, no se encontraron los productos')
     return res.status(404).json({ msg: error.message })
   }
 }
 
-// Filter only enabled products
+// Filter only disabled products
 export const getDisabledProducts = async (req, res) => {
   try {
     const products = getItemsByField(collectionName, 'status', false)
     return res.status(200).json(products)
   } catch (e) {
+    logger.error(e, 'Error fetching disabled products')
     const error = new Error('Error, no se encontraron los productos')
     return res.status(404).json({ msg: error.message })
   }
@@ -69,6 +75,7 @@ export const getProductById = async (req, res) => {
     const product = await getItemById(collectionName, id)
     return res.status(200).json(product)
   } catch (e) {
+    logger.error(e, 'Error fetching product by id')
     const error = new Error('Error, no se encontró este producto')
     return res.status(404).json({ msg: error.message })
   }
@@ -82,6 +89,7 @@ export const addProduct = async (req, res) => {
     await createItem(collectionName, product)
     return res.status(200).json({ msg: 'Producto ingresado correctamente' })
   } catch (e) {
+    logger.error(e, 'Error adding product')
     const error = new Error('Error, no se pudo ingresar el producto')
     return res.status(404).json({ msg: error.message })
   }
@@ -97,6 +105,7 @@ export const updateProduct = async (req, res) => {
     await updateItem(collectionName, id, product)
     return res.status(200).json({ msg: 'Producto actualizado correctamente' })
   } catch (e) {
+    logger.error(e, 'Error updating product')
     const error = new Error('Error, no se encontró este producto')
     return res.status(404).json({ msg: error.message })
   }
@@ -109,6 +118,7 @@ export const deleteProduct = async (req, res) => {
     await deleteItem(collectionName, id)
     return res.status(200).json({ msg: 'Producto eliminado correctamente' })
   } catch (e) {
+    logger.error(e, 'Error deleting product')
     const error = new Error('Error, no se encontró este producto')
     return res.status(404).json({ msg: error.message })
   }
@@ -122,6 +132,7 @@ export const deleteProductField = async (req, res) => {
     await deleteItemField(collectionName, id, fieldName)
     return res.status(200).json({ msg: 'Producto actualizado correctamente' })
   } catch (e) {
+    logger.error(e, 'Error deleting product field')
     const error = new Error('Error, no se encontró este producto')
     return res.status(404).json({ msg: error.message })
   }
@@ -134,30 +145,33 @@ export const getProductsBelowStock = async (req, res) => {
     const products = await getItemsBelowField(collectionName, 'stock', stock)
     return res.status(200).json(products)
   } catch (e) {
+    logger.error(e, 'Error fetching products below stock')
     const error = new Error('Error, no se encontraron los productos')
     return res.status(404).json({ msg: error.message })
   }
 }
 
-// Gets all the products below a stock
+// Gets all the products below a price
 export const getProductsBelowPrice = async (req, res) => {
   try {
     const { price } = req.params
     const products = await getItemsBelowField(collectionName, 'price', price)
     return res.status(200).json(products)
   } catch (e) {
+    logger.error(e, 'Error fetching products below price')
     const error = new Error('Error, no se encontraron los productos')
     return res.status(404).json({ msg: error.message })
   }
 }
 
-// Gets all the products below a stock
+// Gets all the products above a price
 export const getProductsAbovePrice = async (req, res) => {
   try {
     const { price } = req.params
     const products = await getItemsAboveField(collectionName, 'price', price)
     return res.status(200).json(products)
   } catch (e) {
+    logger.error(e, 'Error fetching products above price')
     const error = new Error('Error, no se encontraron los productos')
     return res.status(404).json({ msg: error.message })
   }
@@ -168,16 +182,14 @@ export const getProductsAbovePrice = async (req, res) => {
 export const updateStock = async (productId, quantity) => {
   try {
     const product = await getItemById(collectionName, productId)
-    // console.log(product)
     if (product.stock < quantity) {
       throw new Error(`Stock insuficiente para el producto ${product.name}`)
     }
     const remaining = product.stock - quantity
-    // console.log('stock: ', product.stock, 'quantity: ', quantity)
-    // console.log('remaining: ', remaining)
     const updatedProduct = { ...product, stock: remaining, status: remaining !== 0 }
     await updateItem(collectionName, productId, updatedProduct)
   } catch (e) {
+    logger.error(e, 'Error updating stock for product %s', productId)
     throw new Error('Error, no se encontró este producto')
   }
 }
@@ -188,6 +200,7 @@ export const restoreStock = async (productId, quantity) => {
     const product = await getItemById(collectionName, productId)
     await updateItem(collectionName, productId, { stock: product.stock + quantity })
   } catch (e) {
+    logger.error(e, 'Error restoring stock for product %s', productId)
     throw new Error('Error, no se encontró este producto')
   }
 }

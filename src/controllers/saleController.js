@@ -4,6 +4,8 @@ import { createItem, updateItem, deleteItem, getItems, getItemById } from '../se
 import { updateStock, restoreStock } from './productController.js'
 // Income Reports functions
 import { increaseDailyReport, decreaseDailyReport } from './reportsController.js'
+import logger from '../utils/logger.js'
+
 // Collection name
 const collectionName = 'sales'
 
@@ -13,18 +15,20 @@ export const getSales = async (req, res) => {
     const sales = await getItems(collectionName)
     return res.status(200).json(sales)
   } catch (e) {
+    logger.error(e, 'Error fetching sales')
     const error = new Error('Error, no se encontraron las ventas')
     return res.status(404).json({ msg: error.message })
   }
 }
 
-// Gets a product by id
+// Gets a sale by id
 export const getSaleById = async (req, res) => {
   try {
     const { id } = req.params
     const sale = await getItemById(collectionName, id)
     return res.status(200).json(sale)
   } catch (e) {
+    logger.error(e, 'Error fetching sale by id')
     const error = new Error('Error, no se encontró la venta')
     return res.status(404).json({ msg: error.message })
   }
@@ -45,12 +49,13 @@ export const addSale = async (req, res) => {
     // LLAMAR A FUNCION QUE CREA FACTURA
     return res.status(200).json({ msg: 'Venta creada correctamente' })
   } catch (e) {
+    logger.error(e, 'Error adding sale')
     const error = new Error('Error, no se pudo ingresar la venta')
     return res.status(404).json({ msg: error.message })
   }
 }
 
-// Updates a sell
+// Updates a sale
 export const updateSale = async (req, res) => {
   try {
     const { id } = req.params
@@ -63,12 +68,13 @@ export const updateSale = async (req, res) => {
     await increaseDailyReport(sale) // updates daily income report
     return res.status(200).json({ msg: 'Venta actualizada correctamente' })
   } catch (e) {
+    logger.error(e, 'Error updating sale')
     const error = new Error('Error, no se pudo actualizar la venta')
     return res.status(404).json({ msg: error.message })
   }
 }
 
-// Deletes a sell
+// Deletes a sale
 export const deleteSale = async (req, res) => {
   try {
     const { id } = req.params
@@ -78,6 +84,7 @@ export const deleteSale = async (req, res) => {
     await decreaseDailyReport(sale) // updates daily income report
     return res.status(200).json({ msg: 'Factura eliminada correctamente' })
   } catch (e) {
+    logger.error(e, 'Error deleting sale')
     const error = new Error('Error, no se encontró la venta')
     return res.status(404).json({ msg: error.message })
   }

@@ -7,6 +7,7 @@ import saleRouter from './saleRoute.js'
 import reportRouter from './reportRoute.js'
 import employeeRouter from './employeeRoute.js'
 import authRouter from './authRoute.js'
+import logger from '../utils/logger.js'
 
 // middleware to check user session
 import { userAuth } from '../middleware/userAuth.js'
@@ -33,6 +34,6 @@ export const Router = (app) => {
 
   // Server start
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+    logger.info({ port: PORT }, 'Server running')
   })
 }

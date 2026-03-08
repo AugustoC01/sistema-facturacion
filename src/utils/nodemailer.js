@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer'
 import { mailer } from '../config.js'
+import logger from './logger.js'
 
 const { SENDER, PASS } = mailer
 
@@ -12,7 +13,7 @@ const transporter = nodemailer.createTransport({
 })
 
 export const sendEmail = async (msg, receiver = null) => {
-  const mailOptons = {
+  const mailOptions = {
     from: SENDER,
     to: receiver || SENDER,
     subject: msg.subject,
@@ -20,10 +21,9 @@ export const sendEmail = async (msg, receiver = null) => {
   }
 
   try {
-    await transporter.sendMail(mailOptons)
-    // console.log(`Correo enviado por ${msg.subject}`)
+    await transporter.sendMail(mailOptions)
+    logger.info({ subject: msg.subject }, 'Email sent successfully')
   } catch (e) {
-    // console.log(`Error al enviar el correo: ${error}`)
-    console.log(e)
+    logger.error(e, 'Error sending email with subject "%s"', msg.subject)
   }
 }

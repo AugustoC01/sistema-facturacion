@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import logger from './utils/logger.js'
 
 // APP DATA
 const isDev = process.env.NODE_ENV !== 'production'
@@ -13,7 +14,7 @@ const allowedOrigins = process.env.CORS_ORIGINS
   : []
 if (isDev) {
   allowedOrigins.push('http://localhost:5173')
-  console.log('Allowed Origins:', allowedOrigins)
+  logger.info({ allowedOrigins }, 'CORS allowed origins configured')
 }
 const PORT = process.env.PORT || 8080
 
@@ -28,7 +29,7 @@ const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (isDev) console.log(origin)
+    if (isDev) logger.info({ origin }, 'Incoming CORS request')
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true)
     } else {
@@ -42,4 +43,4 @@ const corsOptions = {
   optionsSuccessStatus: 204
 }
 
-export { PORT, corsOptions, mailer, isDemo, maxLimit, serviceAccountPath }
+export { PORT, corsOptions, mailer, isDemo, isDev, maxLimit, serviceAccountPath }

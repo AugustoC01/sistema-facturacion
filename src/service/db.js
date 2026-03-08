@@ -1,6 +1,7 @@
 import { db } from './firebase.js'
 import { FieldValue } from 'firebase-admin/firestore'
 import { createId } from '../utils/idGenerator.js'
+import logger from '../utils/logger.js'
 
 // Gets
 
@@ -24,17 +25,17 @@ export const createItem = async (collectionName, item) => {
     await db.collection(collectionName).doc(item.id).set(item)
     return item
   } catch (error) {
-    console.error('Unable to create: ', error)
+    logger.error(error, 'Unable to create item in collection "%s"', collectionName)
     throw error
   }
 }
 
-// Udate item
+// Update item
 export const updateItem = async (collectionName, id, item) => {
   try {
     await db.collection(collectionName).doc(id).update(item)
   } catch (error) {
-    console.error('Unable to update: ', error)
+    logger.error(error, 'Unable to update item "%s" in collection "%s"', id, collectionName)
     throw error
   }
 }
@@ -44,7 +45,7 @@ export const deleteItem = async (collectionName, id) => {
   try {
     await db.collection(collectionName).doc(id).delete()
   } catch (error) {
-    console.error('Unable to delete: ', error)
+    logger.error(error, 'Unable to delete item "%s" in collection "%s"', id, collectionName)
     throw error
   }
 }
@@ -56,7 +57,7 @@ export const deleteItemField = async (collectionName, id, fieldName) => {
       [fieldName]: FieldValue.delete()
     })
   } catch (error) {
-    console.error('Unable to delete the field: ', error)
+    logger.error(error, 'Unable to delete field "%s" from item "%s"', fieldName, id)
     throw error
   }
 }
@@ -67,7 +68,7 @@ export const getItems = async (collectionName) => {
     const snapshot = await db.collection(collectionName).get()
     return docsToArray(snapshot)
   } catch (error) {
-    console.error('Unable to get items: ', error)
+    logger.error(error, 'Unable to get items from collection "%s"', collectionName)
     throw error
   }
 }
@@ -82,7 +83,7 @@ export const getItemById = async (collectionName, id) => {
     }
     return null
   } catch (error) {
-    console.error('Unable to get the item: ', error)
+    logger.error(error, 'Unable to get item "%s" from collection "%s"', id, collectionName)
     throw error
   }
 }
@@ -96,7 +97,7 @@ export const getItemsByField = async (collectionName, fieldName, fieldValue) => 
 
     return docsToArray(snapshot)
   } catch (error) {
-    console.error('Unable to get items by field: ', error)
+    logger.error(error, 'Unable to get items by field "%s" in collection "%s"', fieldName, collectionName)
     throw error
   }
 }
@@ -110,7 +111,7 @@ export const getItemsBelowField = async (collectionName, fieldName, fieldValue) 
 
     return docsToArray(snapshot)
   } catch (error) {
-    console.error('Unable to get filtered items: ', error)
+    logger.error(error, 'Unable to get items below field "%s" in collection "%s"', fieldName, collectionName)
     throw error
   }
 }
@@ -124,7 +125,7 @@ export const getItemsAboveField = async (collectionName, fieldName, fieldValue) 
 
     return docsToArray(snapshot)
   } catch (error) {
-    console.error('Unable to get filtered items: ', error)
+    logger.error(error, 'Unable to get items above field "%s" in collection "%s"', fieldName, collectionName)
     throw error
   }
 }
@@ -139,7 +140,7 @@ export const getItemsBetweenField = async (collectionName, fieldName, minValue, 
 
     return docsToArray(snapshot)
   } catch (error) {
-    console.error('Unable to get filtered items: ', error)
+    logger.error(error, 'Unable to get items between fields in collection "%s"', collectionName)
     throw error
   }
 }

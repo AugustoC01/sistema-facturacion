@@ -1,5 +1,7 @@
 // Firestore methods
 import { createItem, updateItem, getItems, getItemById, getItemsBetweenField } from '../service/db.js'
+import logger from '../utils/logger.js'
+
 // Collection name
 const collectionName = 'dailyReports'
 
@@ -74,6 +76,7 @@ export const getDaysReport = async (req, res) => {
     const salesIncome = await getIncomeByDateRange(begin, end)
     return res.status(200).json(salesIncome)
   } catch (e) {
+    logger.error(e, 'Error fetching days report')
     const error = new Error('Error, no se encontraron las ventas')
     return res.status(404).json({ msg: error.message })
   }
@@ -83,8 +86,8 @@ export const getReports = async (req, res) => {
   try {
     const reports = await getItems(collectionName)
     return res.status(200).json(reports)
-  } catch (error) {
-    console.log(error)
-    return res.status(404).json({ msg: error.message })
+  } catch (e) {
+    logger.error(e, 'Error fetching reports')
+    return res.status(404).json({ msg: e.message })
   }
 }

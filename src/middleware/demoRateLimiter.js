@@ -1,5 +1,6 @@
 import rateLimit from 'express-rate-limit'
 import { maxLimit } from '../config.js'
+import logger from '../utils/logger.js'
 
 const demoWriteLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24hs
@@ -19,6 +20,6 @@ export const applyDemoLimiter = (app) => {
   app.put('*', demoWriteLimiter)
   app.delete('*', demoWriteLimiter)
 
-  console.log('🚧 App corriendo en MODO DEMO')
-  console.log('🔒 Rate limit DEMO activo')
+  logger.info('App running in DEMO MODE')
+  logger.info({ maxLimit }, 'Demo rate limit active')
 }
