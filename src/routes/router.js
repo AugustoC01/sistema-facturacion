@@ -1,4 +1,3 @@
-import { PORT } from '../config.js'
 import categoryRouter from './categoryRoute.js'
 import productRouter from './productRoute.js'
 import supplierRouter from './supplierRoute.js'
@@ -7,7 +6,6 @@ import saleRouter from './saleRoute.js'
 import reportRouter from './reportRoute.js'
 import employeeRouter from './employeeRoute.js'
 import authRouter from './authRoute.js'
-import logger from '../utils/logger.js'
 
 // middleware to check user session
 import { userAuth } from '../middleware/userAuth.js'
@@ -30,10 +28,5 @@ export const Router = (app) => {
 
   app.use((_req, res) => {
     res.status(404).json({ message: 'Ruta inexistente' })
-  })
-
-  // Server start
-  app.listen(PORT, () => {
-    logger.info({ port: PORT }, 'Server running')
   })
 }
